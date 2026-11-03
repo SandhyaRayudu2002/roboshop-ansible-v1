@@ -13,6 +13,7 @@
         image_id: "{{ ami_id }}"
         instance_type: "{{ instance_type }}"
         security_groups: "{{ security_groups }}"
+        
         region: us-east-1
         network:
           assign_public_ip: true
