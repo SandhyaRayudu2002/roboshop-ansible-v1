@@ -1,4 +1,5 @@
-- name: Create EC2 instances for Roboshop
+---
+- name: Create Roboshop EC2 instances using AWS CLI
   hosts: localhost
   connection: local
   gather_facts: false
@@ -7,25 +8,34 @@
     - vars.yaml
 
   tasks:
-    - name: Create EC2 instance
-      amazon.aws.ec2_instance:
-        name: "roboshop-{{ item }}"
-        image_id: "{{ ami_id }}"
-        instance_type: "{{ instance_type }}"
-        security_groups: "{{ security_groups }}"
-        
-        region: us-east-1
-        network:
-          assign_public_ip: true
-        tags:
-          Name: "roboshop-{{ item }}"
-      loop:
-        - mongodb
-        - redis
-        - catalogue
-        - user
-        - cart
-        - mysql
-        - shipping
-        - rabbitmq
-        - frontend
+
+    - name: Find security group IDs
+      ansible.builtin.shell: |
+        aws ec2 describe-security-groups 
+          --region {{ region }} 
+          --filters 
+            Name=vpc-id,Values={{ vpc_id }} 
+            Name=group-name,Values=roboshop-common,roboshop-{{ item }} 
+          --query 'SecurityGroups[].GroupId' 
+          --output text
+      loop: "{{ components }}"
+      register: sg_results
+      changed_when: false
+
+    - name: Create EC2 instances
+      ansible.builtin.shell: |
+        aws ec2 run-instances 
+          --region {{ region }} 
+          --image-id {{ ami_id }} 
+          --instance-type {{ instance_type }} 
+          --security-group-ids {{ item.stdout }} 
+          --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=roboshop-{{ item.item }}}]' 
+          --query 'Instances[0].InstanceId' 
+          --output text
+      loop: "{{ sg_results.results }}"
+      register: ec2_results
+
+    - name: Display created instance IDs
+      ansible.builtin.debug:
+        msg: "{{ item.item.item }} : {{ item.stdout }}"
+      loop: "{{ ec2_results.results }}"

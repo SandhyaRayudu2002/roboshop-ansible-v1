@@ -1,6 +1,16 @@
 ami_id: ami-0055977a6e828a4f4
 instance_type: t3.micro
-security_groups:
-  security_groups:
-  - roboshop-common
-  - "roboshop-{{ item }}"
+region: us-east-1
+
+vpc_id: vpc-0cc748d6e3829b235
+
+components:
+  - mongodb
+  - redis
+  - catalogue
+  - user
+  - cart
+  - mysql
+  - shipping
+  - rabbitmq
+  - frontend
