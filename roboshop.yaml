@@ -8,10 +8,13 @@
 
   tasks:
     - name: Find security group IDs
-      ansible.builtin.shell: "aws ec2 describe-security-groups --region {{ region }} --group-names roboshop-common roboshop-{{ item }} --query 'SecurityGroups[].GroupId' --output text"
+      ansible.builtin.shell: >
+        aws ec2 describe-security-groups
+        --region {{ region }}
+        --group-names roboshop-common roboshop-{{ item }}
+        --query "SecurityGroups[].GroupId"
+        --output text
       loop: "{{ components }}"
-      register: sg_results
-      changed_when: false}}"
       register: sg_results
       changed_when: false
 
