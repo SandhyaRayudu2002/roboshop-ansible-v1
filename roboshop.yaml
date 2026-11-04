@@ -1,18 +1,12 @@
-- name: Create EC2 instances
-  hosts: localhost
+- name: create ec2 instances and r53 records
+  hosts: local
   connection: local
-  gather_facts: false
-
-  tasks:
-    - name: Create EC2 instances
-      amazon.aws.ec2_instance:
-        # Your existing module parameters
   vars:
     # ansible-playbook roboshop.yaml -e "instances=['mongodb', 'redis']"
-    
-    instances: ["mongodb","redis","mysql","rabbitmq","catalogue","user","cart","shipping","payment","frontend"]
+    # ansible-playbook roboshop.yaml -e "action=delete"
+    instances: ["mongodb", "redis", "mysql", "rabbitmq", "catalogue", "user", "cart", "shipping", "payment", "frontend"]
     action: create
-    domain_name: sandhya.com
+    domain_name: daws92s.store
     ami_id: ami-0055977a6e828a4f4
   tasks:
   - name: create ec2 instance
