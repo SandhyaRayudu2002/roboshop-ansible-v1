@@ -1,6 +1,12 @@
-- name: create ec2 instances and r53 records
-  hosts: local
+- name: Create EC2 instances
+  hosts: localhost
   connection: local
+  gather_facts: false
+
+  tasks:
+    - name: Create EC2 instances
+      amazon.aws.ec2_instance:
+        # Your existing module parameters
   vars:
     # ansible-playbook roboshop.yaml -e "instances=['mongodb', 'redis']"
     
